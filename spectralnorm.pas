@@ -12,14 +12,14 @@ const
 
 
 type
-   values = array [1..MAXSIZE] of double;
+   values = array [1..MAXSIZE] of real;
 
 var
    n,i	   : integer;
-   u,v,tmp : 
-   vBv,vv  : double;
+   u,v,tmp : values;
+   vBv,vv  : real;
 
-function A(i,j : integer): double; inline;
+function A(i,j : integer): real; inline;
 begin
   A := 1 / ((i+j)*(i+j+1) div 2 + i+1);
 end;
@@ -41,7 +41,7 @@ begin
   for i := 1 to n do
   begin
     Atv[i] := 0.0;
-    for j := low(v) to high(v) do
+    for j := 1 to n do
       Atv[i] := Atv[i] + A(j,i) * v[j];
   end;
 end;
