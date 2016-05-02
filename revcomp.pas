@@ -8,7 +8,7 @@ program reverse_complement;
 
 const
    MAX_ITEMS  = 11;
-   MAX_BUFFER =  32768;
+   MAX_BUFFER =  260000;
 
 type
    buffer_arr =  array[0..MAX_BUFFER] of char;
