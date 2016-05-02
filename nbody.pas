@@ -11,13 +11,13 @@
 
 program n_body;
 
-uses Math;
+{uses Math;}
 
 type
   Body = record
     x, y, z,
     vx, vy, vz,
-    mass : double;
+    mass : real;
   end;
   PBody = ^Body;
 
