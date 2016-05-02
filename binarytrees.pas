@@ -14,12 +14,15 @@ type
     i: Longint;
   end;
 
-function CreateNode(l2, r2: PNode; const i2: Longint): PNode; inline;
+function CreateNode(l2, r2: PNode; i2: Longint): PNode; inline;
+var
+  tmp : PNode;
 begin
-  CreateNode := GetMem(SizeOf(TNode));
-  CreateNode^.l:=l2;
-  CreateNode^.r:=r2;
-  CreateNode^.i:=i2;
+  new(tmp);
+  tmp^.l:=l2;
+  tmp^.r:=r2;
+  tmp^.i:=i2;
+  CreateNode := tmp;
 end;
 
 
@@ -37,11 +40,11 @@ begin
     begin
       DestroyNode(LNode^.l);
       DestroyNode(LNode^.r);
-      FreeMem(LNode, SizeOf(TNode));
+      dispose(LNode);
 
       DestroyNode(RNode^.l);
       DestroyNode(RNode^.r);
-      FreeMem(RNode, SizeOf(TNode));
+      dispose(RNode);
     end
     else
     begin
@@ -50,21 +53,25 @@ begin
     end
   end;
 
-  FreeMem(ANode, SizeOf(TNode));
+  dispose(ANode);
 end;
 
 
 (* Left subnodes check in cycle, right recursive *)
 
 function CheckNode(ANode: PNode): Longint; inline;
+
+var
+  t : LongInt;
+
 begin
-  CheckNode := 0;
+  t := 0;
   while ANode^.l <> nil do
   begin
-    CheckNode += ANode^.i - CheckNode(ANode^.r);
+    t := t + ANode^.i - CheckNode(ANode^.r);
     ANode := ANode^.l
   end;
-  CheckNode += ANode^.i;
+  CheckNode := t + ANode^.i;
 end;
 
 
@@ -86,12 +93,14 @@ begin
    0: Make:=CreateNode(nil, nil, i);
    1: Make:=CreateNode(CreateNode(nil, nil, 2*i-1), CreateNode(nil, nil, 2*i),i);
   else
-      d -= 2; fi := 4*i;
-      Make:=CreateNode(
-                           CreateNode( Make(d, fi-3),Make(d, fi-2), 2*i-1 ),
-                           CreateNode( Make(d, fi-1),Make(d, fi), 2*i ),
-                           i
-                        )
+     begin
+	d := d - 2; fi := 4*i;
+	Make:=CreateNode(
+			 CreateNode( Make(d, fi-3),Make(d, fi-2), 2*i-1 ),
+			 CreateNode( Make(d, fi-1),Make(d, fi), 2*i ),
+			 i
+			 );
+     end;
   end
 end;
 
@@ -99,7 +108,7 @@ const
   mind = 4;
 
 var
-  maxd : Longint = 10;
+  maxd : Longint;
   strd,
   iter,
   c, d, i : Longint;
@@ -107,14 +116,16 @@ var
 
 begin
   if ParamCount = 1 then
-    Val(ParamStr(1), maxd);
+    Val(ParamStr(1), maxd)
+  else
+    maxd := 10;
 
   if maxd < mind+2 then
      maxd := mind + 2;
 
   strd:=maxd + 1;
   tree:=Make(strd, 0);
-  Writeln('stretch tree of depth ', strd, #9' check: ', CheckNode(tree));
+  Writeln('stretch tree of depth ', strd, chr(9), ' check: ', CheckNode(tree));
   DestroyNode(tree);
 
   llt:=Make(maxd, 0);
@@ -131,10 +142,10 @@ begin
       c:=c + CheckNode(tree);
       DestroyNode(tree);
     end;
-    Writeln(2 * Iter, #9' trees of depth ', d, #9' check: ', c);
-    Inc(d, 2);
+    Writeln(2 * Iter, chr(9),' trees of depth ', d, chr(9), ' check: ', c);
+    d := d + 2;
   end;
 
-  Writeln('long lived tree of depth ', maxd, #9' check: ', CheckNode(llt));
+  Writeln('long lived tree of depth ', maxd, chr(9),' check: ', CheckNode(llt));
   DestroyNode(llt);
 end.
