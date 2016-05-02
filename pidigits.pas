@@ -12,6 +12,9 @@ program pidigits;
 type
   { TBigInt }
 
+  DWord = 0..4294967295;
+  PDWord = ^DWord;
+
   PBigInt = ^TBigInt;
 
   { TBigInt }
@@ -21,15 +24,15 @@ type
     Digit: pdword;
     FSize: integer;
     Capacity: integer;
-    FNextFree: TBigInt; // used to maintain the freelist
+    FNextFree: PBigInt; (* used to maintain the freelist *)
     procedure Clear;
     procedure Resize(NewSize: integer);
     function IsNegative: boolean; inline;
     function IsZero: boolean; inline;
     procedure Negate;
   public
-    constructor Create(InitialSize: integer);
-    destructor Destroy; override;
+    procedure Create(InitialSize: integer);
+    procedure Destroy; override;
     function GetDigit(i: integer) : DWord; inline;
   end;
 
